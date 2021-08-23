@@ -233,7 +233,7 @@ export class ShadowCss {
    * adds the original keyframe name to a provided set to collect all keyframes names
    * so that it can later be used to scope the animation rules.
    *
-   * For example, it take a rule such as:
+   * For example, it takes a rule such as:
    *
    * ```
    * @keyframes box-animation {
@@ -243,7 +243,7 @@ export class ShadowCss {
    * }
    * ```
    *
-   * returns:
+   * and returns:
    *
    * ```
    * @keyframes scopeName_box-animation {
@@ -252,7 +252,7 @@ export class ShadowCss {
    *   }
    * }
    * ```
-   * and as a side effect it adds "box-animation" to the unscopedKeyframesSet set
+   * and as a side effect it adds "box-animation" to the `unscopedKeyframesSet` set
    *
    * @param cssRule the css rule to process.
    * @param scopeSelector the component's scope selector.
@@ -311,7 +311,7 @@ export class ShadowCss {
    * semicolon or the end of the string
    */
   private _animationDeclarationKeyframesRe =
-      /(^|\s+)(?:(?:(['"])((?:\\\\|\\\2|(?!\2).)+)\2)|(-?[A-Za-z][\w\-]*))(?=[,\s;]|$)/g;
+      /(^|\s+)(?:(?:(['"])((?:\\\\|\\\2|(?!\2).)+)\2)|(-?[A-Za-z][\w\-]*))(?=[,\s]|$)/g;
 
   /**
    * Scope an animation rule so that the keyframes mentioned in such rule
@@ -985,7 +985,7 @@ function escapeInStrings(input: string): string {
 
 /**
  * Replace in a string all occurrences of keys in the `ESCAPE_IN_STRING_MAP` map with their
- * original representation, this is simply used to revet the changes applied by the
+ * original representation, this is simply used to revert the changes applied by the
  * escapeInStrings function.
  *
  * For example it reverts the text:
@@ -999,7 +999,7 @@ function escapeInStrings(input: string): string {
  * @param input the css text containing the placeholders.
  *
  * @returns the css text without the placeholders.
- **/
+ */
 function unescapeInStrings(input: string): string {
   let result = input.replace(_cssCommaInPlaceholderReGlobal, ',');
   result = result.replace(_cssSemiInPlaceholderReGlobal, ';');
@@ -1019,15 +1019,15 @@ function unescapeInStrings(input: string): string {
  * to:
  *  `this "is" a '\\\\'test`
  * (note that the latter backslashes are not removed as they are not actually escaping the single
- *quote)
+ * quote)
  *
  *
  * @param input the string possibly containing escaped quotes.
- * @param isQuoted boolean indicating whether the string was quotes inside a bigger string (if not
- *then it means that it doesn't represent an inner string and thus no unescaping is required)
+ * @param isQuoted boolean indicating whether the string was quoted inside a bigger string (if not
+ * then it means that it doesn't represent an inner string and thus no unescaping is required)
  *
  * @returns the string in the "canonical" representation without escaped quotes.
- **/
+ */
 function unescapeQuotes(str: string, isQuoted: boolean): string {
   if (!isQuoted) {
     return str;
