@@ -1029,26 +1029,7 @@ function unescapeInStrings(input: string): string {
  * @returns the string in the "canonical" representation without escaped quotes.
  */
 function unescapeQuotes(str: string, isQuoted: boolean): string {
-  if (!isQuoted) {
-    return str;
-  }
-
-  let result = str;
-  let currentBackSlashes = 0;
-
-  for (let i = 0; i < result.length; i++) {
-    const char = result[i];
-    if (char === '\\') {
-      currentBackSlashes++;
-    } else {
-      if ((char === '\'' || char === '"') && (currentBackSlashes % 2 === 1)) {
-        result = result.slice(0, i - 1) + result.slice(i);
-        i--;
-      }
-      currentBackSlashes = 0;
-    }
-  }
-  return result;
+  return !isQuoted ? str : str.replace(/(?<=(?:^|[^\\])(?:\\\\)*)\\(['"])/g, '$1');
 }
 
 /**

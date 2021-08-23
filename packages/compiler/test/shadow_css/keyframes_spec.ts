@@ -402,8 +402,8 @@ describe('ShadowCss, keyframes and animations', () => {
        const css = `
         div {
             animation: 1s 'f\\"oo', 1.5s "ba\\'r";
-            animation: 2s "fo\\"\\"o", 2.5s 'b\\\"ar';
-            animation: 3s 'foo\\\\', 3.5s "b\\"ar", 3.7s 'ba\\'\\"\\'r';
+            animation: 2s "fo\\"\\"o", 2.5s 'b\\\\"ar';
+            animation: 3s 'foo\\\\', 3.5s "b\\\\\\"ar", 3.7s 'ba\\'\\"\\'r';
             animation: 4s 'fo\\'o', 4.5s 'b\\"ar\\"', 4.7s "baz\\'";
         }
 
@@ -412,7 +412,8 @@ describe('ShadowCss, keyframes and animations', () => {
         @keyframes 'foo\\\\' {}
         @keyframes 'fo\\'o' {}
         @keyframes 'ba\\'r' {}
-        @keyframes 'b\\\"ar' {}
+        @keyframes 'b\\\\"ar' {}
+        @keyframes 'b\\\\\\"ar' {}
         @keyframes 'b"ar"' {}
         @keyframes 'ba\\'\\"\\'r' {}
         `;
@@ -422,15 +423,16 @@ describe('ShadowCss, keyframes and animations', () => {
        expect(result).toContain(`@keyframes 'host-a_foo\\\\' {}`);
        expect(result).toContain(`@keyframes 'host-a_fo\\'o' {}`);
        expect(result).toContain(`@keyframes 'host-a_ba\\'r' {}`);
-       expect(result).toContain(`@keyframes 'host-a_b\\\"ar' {}`);
+       expect(result).toContain(`@keyframes 'host-a_b\\\\"ar' {}`);
+       expect(result).toContain(`@keyframes 'host-a_b\\\\\\"ar' {}`);
        expect(result).toContain(`@keyframes 'host-a_b"ar"' {}`);
        expect(result).toContain(`@keyframes 'host-a_ba\\'\\"\\'r' {}`);
        expect(result).toContain(`animation: 1s 'host-a_f\\"oo', 1.5s "host-a_ba\\'r";`);
-       expect(result).toContain(`animation: 2s "host-a_fo\\"\\"o", 2.5s 'host-a_b\\\"ar';`);
+       expect(result).toContain(`animation: 2s "host-a_fo\\"\\"o", 2.5s 'host-a_b\\\\"ar';`);
        expect(result).toContain(
-           `animation: 3s 'host-a_foo\\\\', 3.5s "host-a_b\\"ar", 3.7s 'host-a_ba\\'\\"\\'r';`);
+           `animation: 3s 'host-a_foo\\\\', 3.5s "host-a_b\\\\\\"ar", 3.7s 'host-a_ba\\'\\"\\'r';`);
        expect(result).toContain(
-           `animation: 4s 'host-a_fo\\\'o', 4.5s 'host-a_b\\"ar\\"', 4.7s "baz\\'";`);
+           `animation: 4s 'host-a_fo\\'o', 4.5s 'host-a_b\\"ar\\"', 4.7s "baz\\'";`);
      });
 
   it('should handle the usage of commas inside quotes', () => {
