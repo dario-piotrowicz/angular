@@ -341,6 +341,7 @@ describe('ShadowCss, keyframes and animations', () => {
             animation: 2s "fo\\"o", 2.5s "bar";
             animation: 3s "foo\\"", 3.5s "bar", 3.7s "ba\\"r";
             animation: 4s "foo\\\\", 4.5s "bar", 4.7s "baz\\"";
+            animation: 5s "fo\\\\\\"o", 5.5s "bar", 5.7s "baz\\"";
         }
 
         @keyframes "foo" {}
@@ -349,6 +350,7 @@ describe('ShadowCss, keyframes and animations', () => {
         @keyframes 'foo\\\\' {}
         @keyframes bar {}
         @keyframes "ba\\"r" {}
+        @keyframes "fo\\\\\\"o" {}
         `;
        const result = s(css, 'host-a');
        expect(result).toContain('@keyframes "host-a_foo" {}');
@@ -357,12 +359,15 @@ describe('ShadowCss, keyframes and animations', () => {
        expect(result).toContain(`@keyframes 'host-a_foo\\\\' {}`);
        expect(result).toContain(`@keyframes host-a_bar {}`);
        expect(result).toContain(`@keyframes "host-a_ba\\"r" {}`);
+       expect(result).toContain(`@keyframes "host-a_fo\\\\\\"o"`);
        expect(result).toContain('animation: 1s "host-a_foo", 1.5s "host-a_bar";');
        expect(result).toContain(`animation: 2s "host-a_fo\\"o", 2.5s "host-a_bar";`);
        expect(result).toContain(
            `animation: 3s "host-a_foo\\"", 3.5s "host-a_bar", 3.7s "host-a_ba\\"r";`);
        expect(result).toContain(
            `animation: 4s "host-a_foo\\\\", 4.5s "host-a_bar", 4.7s "baz\\"";`);
+       expect(result).toContain(
+           `animation: 5s "host-a_fo\\\\\\"o", 5.5s "host-a_bar", 5.7s "baz\\"";`);
      });
 
   it('should handle the usage of single quotes escaping in multiple animation definitions in a single declaration',
@@ -373,6 +378,7 @@ describe('ShadowCss, keyframes and animations', () => {
             animation: 2s 'fo\\'o', 2.5s 'bar';
             animation: 3s 'foo\\'', 3.5s 'bar', 3.7s 'ba\\'r';
             animation: 4s 'foo\\\\', 4.5s 'bar', 4.7s 'baz\\'';
+            animation: 5s 'fo\\\\\\'o', 5.5s 'bar', 5.7s 'baz\\'';
         }
 
         @keyframes foo {}
@@ -381,6 +387,7 @@ describe('ShadowCss, keyframes and animations', () => {
         @keyframes 'foo\\\\' {}
         @keyframes "bar" {}
         @keyframes 'ba\\'r' {}
+        @keyframes "fo\\\\\\'o" {}
         `;
        const result = s(css, 'host-a');
        expect(result).toContain('@keyframes host-a_foo {}');
@@ -389,12 +396,15 @@ describe('ShadowCss, keyframes and animations', () => {
        expect(result).toContain(`@keyframes 'host-a_foo\\\\' {}`);
        expect(result).toContain(`@keyframes "host-a_bar" {}`);
        expect(result).toContain(`@keyframes 'host-a_ba\\'r' {}`);
+       expect(result).toContain(`@keyframes "host-a_fo\\\\\\'o" {}`);
        expect(result).toContain(`animation: 1s 'host-a_foo', 1.5s 'host-a_bar';`);
        expect(result).toContain(`animation: 2s 'host-a_fo\\'o', 2.5s 'host-a_bar';`);
        expect(result).toContain(
            `animation: 3s 'host-a_foo\\'', 3.5s 'host-a_bar', 3.7s 'host-a_ba\\'r';`);
        expect(result).toContain(
            `animation: 4s 'host-a_foo\\\\', 4.5s 'host-a_bar', 4.7s 'baz\\'';`);
+       expect(result).toContain(
+           `animation: 5s 'host-a_fo\\\\\\'o', 5.5s 'host-a_bar', 5.7s 'baz\\''`);
      });
 
   it('should handle the usage of mixed single and double quotes escaping in multiple animation definitions in a single declaration',
