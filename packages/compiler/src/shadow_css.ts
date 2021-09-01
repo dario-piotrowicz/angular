@@ -288,7 +288,7 @@ export class ShadowCss {
    * scoped.
    */
   private _scopeAnimationKeyframe(
-      keyframe: string, scopeSelector: string, unscopedKeyframesSet: Set<string>): string {
+      keyframe: string, scopeSelector: string, unscopedKeyframesSet: ReadonlySet<string>): string {
     return keyframe.replace(/^(\s*)(['"]?)(.+?)\2(\s*)$/, (_, spaces1, quote, name, spaces2) => {
       name = `${unscopedKeyframesSet.has(unescapeQuotes(name, quote)) ? scopeSelector + '_' : ''}${
           name}`;
@@ -326,7 +326,7 @@ export class ShadowCss {
    * @returns the updated css rule.
    **/
   private _scopeAnimationRule(
-      rule: CssRule, scopeSelector: string, unscopedKeyframesSet: Set<string>): CssRule {
+      rule: CssRule, scopeSelector: string, unscopedKeyframesSet: ReadonlySet<string>): CssRule {
     let content = rule.content.replace(
         /((?:^|\s+)(?:-webkit-)?animation(?:\s*):(?:\s*))([^;]+)/g,
         (_, start, animationDeclarations) => start +
