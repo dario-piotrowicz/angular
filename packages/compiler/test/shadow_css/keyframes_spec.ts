@@ -302,7 +302,7 @@ describe('ShadowCss, keyframes and animations', () => {
     expect(result).toContain(`@keyframes "host-a_bar' 'baz" {}`);
     expect(result).toContain('@keyframes "host-a_foz \\" baz" {}');
     expect(result).toContain('animation: 1.5s "host-a_foo\\"bar";');
-    expect(result).toContain("animation: 1s 'host-a_bar\\' \\'baz';");
+    expect(result).toContain('animation: 1s \'host-a_bar\\\' \\\'baz\';');
     expect(result).toContain(`animation-name: 'host-a_foz " baz';`);
   });
 
@@ -328,7 +328,7 @@ describe('ShadowCss, keyframes and animations', () => {
        expect(result).toContain('@keyframes "host-a_qux quux" {}');
        expect(result).toContain('@keyframes "host-a_bar, baz" {}');
        expect(result).toContain(`animation: 1s "foo bar, baz", 2s 'host-a_qux quux';`);
-       expect(result).toContain("animation: 500ms foo, 1s 'host-a_bar, baz', 1500ms bar;");
+       expect(result).toContain('animation: 500ms foo, 1s \'host-a_bar, baz\', 1500ms bar;');
        expect(result).toContain(
            `animation: 3s "host-a_bar, baz", 3s 'foo, bar' 1s, 3s "host-a_qux quux";`);
      });
@@ -356,7 +356,7 @@ describe('ShadowCss, keyframes and animations', () => {
        expect(result).toContain('@keyframes "host-a_foo" {}');
        expect(result).toContain('@keyframes "host-a_fo\\"o" {}');
        expect(result).toContain(`@keyframes 'host-a_foo"' {}`);
-       expect(result).toContain("@keyframes 'host-a_foo\\\\' {}");
+       expect(result).toContain('@keyframes \'host-a_foo\\\\\' {}');
        expect(result).toContain('@keyframes host-a_bar {}');
        expect(result).toContain('@keyframes "host-a_ba\\"r" {}');
        expect(result).toContain('@keyframes "host-a_fo\\\\\\"o"');
@@ -391,20 +391,20 @@ describe('ShadowCss, keyframes and animations', () => {
         `;
        const result = s(css, 'host-a');
        expect(result).toContain('@keyframes host-a_foo {}');
-       expect(result).toContain("@keyframes 'host-a_fo\\'o' {}");
-       expect(result).toContain("@keyframes 'host-a_foo'' {}");
-       expect(result).toContain("@keyframes 'host-a_foo\\\\' {}");
+       expect(result).toContain('@keyframes \'host-a_fo\\\'o\' {}');
+       expect(result).toContain('@keyframes \'host-a_foo\'\' {}');
+       expect(result).toContain('@keyframes \'host-a_foo\\\\\' {}');
        expect(result).toContain('@keyframes "host-a_bar" {}');
-       expect(result).toContain("@keyframes 'host-a_ba\\'r' {}");
+       expect(result).toContain('@keyframes \'host-a_ba\\\'r\' {}');
        expect(result).toContain(`@keyframes "host-a_fo\\\\\\'o" {}`);
-       expect(result).toContain("animation: 1s 'host-a_foo', 1.5s 'host-a_bar';");
-       expect(result).toContain("animation: 2s 'host-a_fo\\'o', 2.5s 'host-a_bar';");
+       expect(result).toContain('animation: 1s \'host-a_foo\', 1.5s \'host-a_bar\';');
+       expect(result).toContain('animation: 2s \'host-a_fo\\\'o\', 2.5s \'host-a_bar\';');
        expect(result).toContain(
-           "animation: 3s 'host-a_foo\\'', 3.5s 'host-a_bar', 3.7s 'host-a_ba\\'r';");
+           'animation: 3s \'host-a_foo\\\'\', 3.5s \'host-a_bar\', 3.7s \'host-a_ba\\\'r\';');
        expect(result).toContain(
-           "animation: 4s 'host-a_foo\\\\', 4.5s 'host-a_bar', 4.7s 'baz\\'';");
+           'animation: 4s \'host-a_foo\\\\\', 4.5s \'host-a_bar\', 4.7s \'baz\\\'\';');
        expect(result).toContain(
-           "animation: 5s 'host-a_fo\\\\\\'o', 5.5s 'host-a_bar', 5.7s 'baz\\''");
+           'animation: 5s \'host-a_fo\\\\\\\'o\', 5.5s \'host-a_bar\', 5.7s \'baz\\\'\'');
      });
 
   it('should handle the usage of mixed single and double quotes escaping in multiple animation definitions in a single declaration',
@@ -430,9 +430,9 @@ describe('ShadowCss, keyframes and animations', () => {
        const result = s(css, 'host-a');
        expect(result).toContain(`@keyframes 'host-a_f"oo' {}`);
        expect(result).toContain(`@keyframes 'host-a_fo""o' {}`);
-       expect(result).toContain("@keyframes 'host-a_foo\\\\' {}");
-       expect(result).toContain("@keyframes 'host-a_fo\\'o' {}");
-       expect(result).toContain("@keyframes 'host-a_ba\\'r' {}");
+       expect(result).toContain('@keyframes \'host-a_foo\\\\\' {}');
+       expect(result).toContain('@keyframes \'host-a_fo\\\'o\' {}');
+       expect(result).toContain('@keyframes \'host-a_ba\\\'r\' {}');
        expect(result).toContain(`@keyframes 'host-a_b\\\\"ar' {}`);
        expect(result).toContain(`@keyframes 'host-a_b\\\\\\"ar' {}`);
        expect(result).toContain(`@keyframes 'host-a_b"ar"' {}`);
