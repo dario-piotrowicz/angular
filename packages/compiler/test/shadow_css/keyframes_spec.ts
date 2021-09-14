@@ -486,7 +486,7 @@ describe('ShadowCss, keyframes and animations', () => {
     expect(result).toContain('animation: 5s "host-a_forwards" 1s forwards;');
   });
 
-  it('should handle correctly css functions', () => {
+  it('should handle css functions correctly', () => {
     const css = `
         div {
             animation: foo 0.5s alternate infinite cubic-bezier(.17, .67, .83, .67);
