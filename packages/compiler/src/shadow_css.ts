@@ -348,8 +348,8 @@ export class ShadowCss {
                 }));
     content = content.replace(
         /((?:^|\s+)(?:-webkit-)?animation-name(?:\s*):(?:\s*))([^;]+)/g,
-        (_match, start, csvKeyframes) => `${start}${
-            csvKeyframes.split(',')
+        (_match, start, commaSeparatedKeyframes) => `${start}${
+            commaSeparatedKeyframes.split(',')
                 .map(
                     (keyframe: string) =>
                         this._scopeAnimationKeyframe(keyframe, scopeSelector, unscopedKeyframesSet))
