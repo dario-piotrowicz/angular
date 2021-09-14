@@ -862,7 +862,7 @@ export function processRules(input: string, ruleCallback: (rule: CssRule) => Css
   input = escapeInStrings(input);
   const inputWithEscapedBlocks = escapeBlocks(input, CONTENT_PAIRS, BLOCK_PLACEHOLDER);
   let nextBlockIndex = 0;
-  const tmpResult = inputWithEscapedBlocks.escapedString.replace(_ruleRe, (...m: string[]) => {
+  const escapedResult = inputWithEscapedBlocks.escapedString.replace(_ruleRe, (...m: string[]) => {
     const selector = m[2];
     let content = '';
     let suffix = m[4];
@@ -875,7 +875,7 @@ export function processRules(input: string, ruleCallback: (rule: CssRule) => Css
     const rule = ruleCallback(new CssRule(selector, content));
     return `${m[1]}${rule.selector}${m[3]}${contentPrefix}${rule.content}${suffix}`;
   });
-  return unescapeInStrings(tmpResult);
+  return unescapeInStrings(escapedResult);
 }
 
 class StringWithEscapedBlocks {
