@@ -859,8 +859,8 @@ export class CssRule {
 }
 
 export function processRules(input: string, ruleCallback: (rule: CssRule) => CssRule): string {
-  input = escapeInStrings(input);
-  const inputWithEscapedBlocks = escapeBlocks(input, CONTENT_PAIRS, BLOCK_PLACEHOLDER);
+  const escaped = escapeInStrings(input);
+  const inputWithEscapedBlocks = escapeBlocks(escaped, CONTENT_PAIRS, BLOCK_PLACEHOLDER);
   let nextBlockIndex = 0;
   const escapedResult = inputWithEscapedBlocks.escapedString.replace(_ruleRe, (...m: string[]) => {
     const selector = m[2];
