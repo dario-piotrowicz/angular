@@ -27,7 +27,7 @@ describe('ShadowCss, keyframes and animations', () => {
     expect(s(css, 'host-a')).toEqual(expected);
   });
 
-  it('should scope animations using local keyframes', () => {
+  it('should scope animations using local keyframes identifiers', () => {
     const css = `
         button {
             animation: foo 10s ease;
@@ -42,7 +42,7 @@ describe('ShadowCss, keyframes and animations', () => {
     expect(result).toContain('animation: host-a_foo 10s ease;');
   });
 
-  it('should not scope animations using non-local keyframes', () => {
+  it('should not scope animations using non-local keyframes identifiers', () => {
     const css = `
         button {
             animation: foo 10s ease;
@@ -52,7 +52,7 @@ describe('ShadowCss, keyframes and animations', () => {
     expect(result).toContain('animation: foo 10s ease;');
   });
 
-  it('should scope animation-names using local keyframes', () => {
+  it('should scope animation-names using local keyframes identifiers', () => {
     const css = `
         button {
             animation-name: foo;
@@ -67,7 +67,7 @@ describe('ShadowCss, keyframes and animations', () => {
     expect(result).toContain('animation-name: host-a_foo;');
   });
 
-  it('should not scope animation-names using non-local keyframes', () => {
+  it('should not scope animation-names using non-local keyframes identifiers', () => {
     const css = `
         button {
             animation-name: foo;
@@ -162,7 +162,7 @@ describe('ShadowCss, keyframes and animations', () => {
                         2s host-a_bar;`);
   });
 
-  it(`should not modify css variables ending with 'animation' even if they reference a local keyframes`,
+  it(`should not modify css variables ending with 'animation' even if they reference a local keyframes identifier`,
      () => {
        const css = `
         button {
@@ -173,7 +173,7 @@ describe('ShadowCss, keyframes and animations', () => {
        expect(result).toContain('--variable-animation: foo;');
      });
 
-  it(`should not modify css variables ending with 'animation-name' even if they reference a local keyframes`,
+  it(`should not modify css variables ending with 'animation-name' even if they reference a local keyframes identifier`,
      () => {
        const css = `
         button {
