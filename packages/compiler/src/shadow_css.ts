@@ -956,17 +956,16 @@ const ESCAPE_IN_STRING_MAP: {[key: string]: string} = {
  **/
 function escapeInStrings(input: string): string {
   let result = input;
-  let insideString = false;
-  let currentQuoteChar: string|undefined;
+  let currentQuoteChar: string|null = null;
   for (let i = 0; i < result.length; i++) {
     const char = result[i];
     if (char === '\\') {
       i++;
     } else {
-      if (insideString) {
+      if (currentQuoteChar !== null) {
+        // index i is inside a quoted sub-string
         if (char === currentQuoteChar) {
-          currentQuoteChar = undefined;
-          insideString = false;
+          currentQuoteChar = null;
         } else {
           const placeholder: string|undefined = ESCAPE_IN_STRING_MAP[char];
           if (placeholder) {
@@ -976,7 +975,6 @@ function escapeInStrings(input: string): string {
         }
       } else if (char === '\'' || char === '"') {
         currentQuoteChar = char;
-        insideString = true;
       }
     }
   }
