@@ -1027,7 +1027,7 @@ function unescapeInStrings(input: string): string {
  * @returns the string in the "canonical" representation without escaped quotes.
  */
 function unescapeQuotes(str: string, isQuoted: boolean): string {
-  return !isQuoted ? str : str.replace(/(?<=(?:^|[^\\])(?:\\\\)*)\\(['"])/g, '$1');
+  return !isQuoted ? str : str.replace(/((?:^|[^\\])(?:\\\\)*)\\(?=['"])/g, '$1');
 }
 
 /**
