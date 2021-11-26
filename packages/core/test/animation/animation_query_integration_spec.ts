@@ -792,56 +792,98 @@ describe('animation query tests', function() {
       expect(player.element.style.height).toEqual('444px');
     });
 
-    it('should find newly inserted items in the component via :enter', () => {
-      @Component({
-        selector: 'ani-cmp',
-        template: `
+    it('should find newly inserted items in the component via :enter if they are valid entering elements',
+       () => {
+         @Component({
+           selector: 'ani-cmp',
+           template: `
+            <div @myAnimation *ngFor="let item of items">
+              <div class="child">
+                {{ item }}
+              </div>
+            </div>
+          `,
+           animations: [trigger(
+               'myAnimation',
+               [
+                 transition(
+                     ':enter',
+                     [
+                       query(
+                           '.child',
+                           [
+                             style({opacity: 0}),
+                             animate(1000, style({opacity: .5})),
+                           ]),
+                     ]),
+               ])]
+         })
+         class Cmp {
+           public items: any[] = [0, 1, 2];
+         }
+
+         TestBed.configureTestingModule({declarations: [Cmp]});
+
+         const engine = TestBed.inject(ɵAnimationEngine);
+         const fixture = TestBed.createComponent(Cmp);
+
+         fixture.detectChanges();
+         engine.flush();
+
+         const players = getLog();
+         expect(players.length).toEqual(3);
+
+         const [p1, p2, p3] = players;
+         expect(p1.element.innerText.trim()).toEqual('0');
+         expect(p2.element.innerText.trim()).toEqual('1');
+         expect(p3.element.innerText.trim()).toEqual('2');
+
+         players.forEach(p => {
+           expect(p.keyframes).toEqual([{opacity: '0', offset: 0}, {opacity: '0.5', offset: 1}]);
+         });
+       });
+
+    it('should not find newly inserted items in the component via :enter if they are not valid entering elements',
+       () => {
+         @Component({
+           selector: 'ani-cmp',
+           template: `
             <div @myAnimation>
               <div *ngFor="let item of items" class="child">
                 {{ item }}
               </div>
             </div>
           `,
-        animations: [trigger(
-            'myAnimation',
-            [
-              transition(
-                  ':enter',
-                  [
-                    query(
-                        ':enter',
-                        [
-                          style({opacity: 0}),
-                          animate(1000, style({opacity: .5})),
-                        ]),
-                  ]),
-            ])]
-      })
-      class Cmp {
-        public items: any[] = [0, 1, 2];
-      }
+           animations: [trigger(
+               'myAnimation',
+               [
+                 transition(
+                     ':enter',
+                     [
+                       query(
+                           '.child',
+                           [
+                             style({opacity: 0}),
+                             animate(1000, style({opacity: .5})),
+                           ]),
+                     ]),
+               ])]
+         })
+         class Cmp {
+           public items: any[] = [0, 1, 2];
+         }
 
-      TestBed.configureTestingModule({declarations: [Cmp]});
+         TestBed.configureTestingModule({declarations: [Cmp]});
 
-      const engine = TestBed.inject(ɵAnimationEngine);
-      const fixture = TestBed.createComponent(Cmp);
-      const cmp = fixture.componentInstance;
+         const engine = TestBed.inject(ɵAnimationEngine);
+         const fixture = TestBed.createComponent(Cmp);
 
-      fixture.detectChanges();
-      engine.flush();
+         fixture.detectChanges();
+         engine.flush();
 
-      const players = getLog();
-      expect(players.length).toEqual(3);
-
-      const [p1, p2, p3] = players;
-      expect(p1.element.innerText.trim()).toEqual('0');
-      expect(p2.element.innerText.trim()).toEqual('1');
-      expect(p3.element.innerText.trim()).toEqual('2');
-
-      players.forEach(p => {
-        expect(p.keyframes).toEqual([{opacity: '0', offset: 0}, {opacity: '0.5', offset: 1}]);
-      });
-    });
+         const players = getLog();
+         expect(players.length).toEqual(0);
+       });
 
     it('should cleanup :enter and :leave artifacts from nodes when any animation sequences fail to be built',
        () => {
@@ -2880,11 +2922,7 @@ describe('animation query tests', function() {
          const cmp = fixture.componentInstance;
          const child = cmp.childCmp;
 
-         expect(cmp.log).toEqual(['parent-start', 'parent-done']);
-         expect(child.log).toEqual(['child-start', 'child-done']);
-
          cmp.log = [];
-         child.log = [];
          cmp.exp = 'go';
          cmp.childCmp.exp = 'go';
          fixture.detectChanges();
@@ -3161,7 +3199,7 @@ describe('animation query tests', function() {
                                style({opacity: 0}),
                                animate(1000, style({opacity: 1})),
                              ]),
-                             query(':enter @child', animateChild()),
+                             query('@child:enter', animateChild()),
                            ])),
               ]),
           trigger(
@@ -3170,19 +3208,14 @@ describe('animation query tests', function() {
                 transition(
                     ':enter',
                     [
-                      query(
-                          ':enter .item',
-                          [style({opacity: 0}), animate(1000, style({opacity: 1}))]),
+                      query('.item', [style({opacity: 0}), animate(1000, style({opacity: 1}))]),
                     ]),
               ]),
         ],
         template: `
                <div @parent *ngIf="exp1" class="container">
-                 <div *ngIf="exp2">
-                   <div @child>
-                     <div *ngIf="exp3">
-                       <div class="item"></div>
-                     </div>
+                 <div @child *ngIf="exp2">
+                     <div *ngIf="exp3" class="item">
                    </div>
                  </div>
                </div>

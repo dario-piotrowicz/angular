@@ -347,17 +347,18 @@ describe('animation tests', function() {
     // https://github.com/angular/angular/issues/32794
     it('should support nested animation triggers', () => {
       const REUSABLE_ANIMATION = [trigger('myAnimation', [
-        transition('void => *', [style({'opacity': '0'}), animate(500, style({'opacity': '1'}))])
+        transition('* => *', [style({'opacity': '0'}), animate(500, style({'opacity': '1'}))])
       ])];
 
       @Component({
         selector: 'if-cmp',
         template: `
-          <div @myAnimation></div>
+          <div [@myAnimation]="value"></div>
         `,
         animations: [REUSABLE_ANIMATION],
       })
       class Cmp {
+        value = true;
       }
 
       TestBed.configureTestingModule({declarations: [Cmp]});
@@ -582,8 +583,8 @@ describe('animation tests', function() {
          @Component({
            selector: 'if-cmp',
            template: `
-          <div *ngIf="exp">
-            <div @myAnimation (@myAnimation.start)="track($event)" (@myAnimation.done)="track($event)"></div>
+          <div>
+            <div *ngIf="exp" @myAnimation (@myAnimation.start)="track($event)" (@myAnimation.done)="track($event)"></div>
           </div>
         `,
            animations: [
@@ -1509,7 +1510,7 @@ describe('animation tests', function() {
       @Component({
         selector: 'ani-cmp',
         template: `
-            <div #green @green></div>
+            <div #green [@green]="value"></div>
           `,
         animations: [trigger(
             'green',
@@ -1517,6 +1518,7 @@ describe('animation tests', function() {
       })
       class Cmp {
         @ViewChild('green') public element: any;
+        value = true;
       }
 
       TestBed.configureTestingModule({declarations: [Cmp]});

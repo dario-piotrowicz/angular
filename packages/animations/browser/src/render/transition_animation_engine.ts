@@ -252,6 +252,14 @@ export class AnimationTransitionNamespace {
 
     let transition =
         trigger.matchTransition(fromState.value, toState.value, element, toState.params);
+
+    if (fromState.value === VOID_VALUE && toState.value === null &&
+        !this._engine.collectedEnterElements.includes(element)) {
+      // the transition is for entering but the element should not be animated
+      // as entering (since it hasn't been collected as such)
+      return;
+    }
+
     let isFallbackTransition = false;
     if (!transition) {
       if (!defaultToFallback) return;
