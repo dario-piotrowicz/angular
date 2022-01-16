@@ -20,10 +20,14 @@ export class Animation {
   private _animationAst: Ast<AnimationMetadataType>;
   constructor(private _driver: AnimationDriver, input: AnimationMetadata|AnimationMetadata[]) {
     const errors: string[] = [];
-    const ast = buildAnimationAst(_driver, input, errors);
+    const warnings: string[] = [];
+    const ast = buildAnimationAst(_driver, input, errors, warnings);
     if (errors.length) {
       const errorMessage = `animation validation failed:\n${errors.join('\n')}`;
       throw new Error(errorMessage);
+    }
+    if (ngDevMode && warnings.length) {
+      console.warn(`animation validation warnings:\n"${warnings.join('\n')}`);
     }
     this._animationAst = ast;
   }

@@ -31,11 +31,15 @@ export class TimelineAnimationEngine {
 
   register(id: string, metadata: AnimationMetadata|AnimationMetadata[]) {
     const errors: string[] = [];
-    const ast = buildAnimationAst(this._driver, metadata, errors);
+    const warnings: string[] = [];
+    const ast = buildAnimationAst(this._driver, metadata, errors, warnings);
     if (errors.length) {
       throw new Error(
           `Unable to build the animation due to the following errors: ${errors.join('\n')}`);
     } else {
+      if (ngDevMode && warnings.length) {
+        console.warn(`Animation built with the following warnings: "${warnings.join('\n')}`);
+      }
       this._animations.set(id, ast);
     }
   }

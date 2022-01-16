@@ -55,9 +55,9 @@ const SELF_TOKEN_REGEX = new RegExp(`\s*${SELF_TOKEN}\s*,?`, 'g');
  * Otherwise an error will be thrown.
  */
 export function buildAnimationAst(
-    driver: AnimationDriver, metadata: AnimationMetadata|AnimationMetadata[],
-    errors: string[]): Ast<AnimationMetadataType> {
-  return new AnimationAstBuilderVisitor(driver).build(metadata, errors);
+    driver: AnimationDriver, metadata: AnimationMetadata|AnimationMetadata[], errors: string[],
+    warnings: string[]): Ast<AnimationMetadataType> {
+  return new AnimationAstBuilderVisitor(driver).build(metadata, errors, warnings);
 }
 
 const ROOT_SELECTOR = '';
@@ -65,12 +65,19 @@ const ROOT_SELECTOR = '';
 export class AnimationAstBuilderVisitor implements AnimationDslVisitor {
   constructor(private _driver: AnimationDriver) {}
 
-  build(metadata: AnimationMetadata|AnimationMetadata[], errors: string[]):
+  build(metadata: AnimationMetadata|AnimationMetadata[], errors: string[], warnings: string[]):
       Ast<AnimationMetadataType> {
     const context = new AnimationAstBuilderContext(errors);
     this._resetContextStyleTimingState(context);
-    return <Ast<AnimationMetadataType>>visitDslNode(
-        this, normalizeAnimationEntry(metadata), context);
+    const ast =
+        <Ast<AnimationMetadataType>>visitDslNode(this, normalizeAnimationEntry(metadata), context);
+
+    if (context.unsupportedCSSPropertiesFound.size) {
+      warnings.push(
+          `The provided CSS properties are not recognized properties supported for animations: ${
+                  [...context.unsupportedCSSPropertiesFound.keys()].join(', ')}`);
+    }
+    return ast;
   }
 
   private _resetContextStyleTimingState(context: AnimationAstBuilderContext) {
@@ -301,8 +308,8 @@ export class AnimationAstBuilderVisitor implements AnimationDslVisitor {
 
       tuple.forEach((value, prop) => {
         if (!this._driver.validateStyleProperty(prop)) {
-          context.errors.push(`The provided animation property "${
-              prop}" is not a supported CSS property for animations`);
+          delete tuple[prop];
+          context.unsupportedCSSPropertiesFound.add(prop);
           return;
         }
 
@@ -511,6 +518,7 @@ export class AnimationAstBuilderContext {
   public currentTime: number = 0;
   public collectedStyles = new Map<string, Map<string, StyleTimeTuple>>();
   public options: AnimationOptions|null = null;
+  public unsupportedCSSPropertiesFound: Set<string> = new Set<string>();
   constructor(public errors: string[]) {}
 }
 

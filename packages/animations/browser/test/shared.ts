@@ -18,12 +18,17 @@ export function makeTrigger(
     name: string, steps: any, skipErrors: boolean = false): AnimationTrigger {
   const driver = new MockAnimationDriver();
   const errors: string[] = [];
+  const warnings: string[] = [];
   const triggerData = trigger(name, steps);
-  const triggerAst = buildAnimationAst(driver, triggerData, errors) as TriggerAst;
+  const triggerAst = buildAnimationAst(driver, triggerData, errors, warnings) as TriggerAst;
+  const LINE_START = '\n - ';
   if (!skipErrors && errors.length) {
-    const LINE_START = '\n - ';
     throw new Error(`Animation parsing for the ${name} trigger have failed:${LINE_START}${
         errors.join(LINE_START)}`);
+  }
+  if (ngDevMode && warnings.length) {
+    console.warn(`Animation parsing for the ${name} trigger presents warnings:${LINE_START}${
+        warnings.join(LINE_START)}`);
   }
   return buildTrigger(name, triggerAst, new NoopAnimationStyleNormalizer());
 }

@@ -43,11 +43,16 @@ export class AnimationEngine {
     let trigger = this._triggerCache[cacheKey];
     if (!trigger) {
       const errors: string[] = [];
-      const ast =
-          buildAnimationAst(this._driver, metadata as AnimationMetadata, errors) as TriggerAst;
+      const warnings: string[] = [];
+      const ast = buildAnimationAst(
+                      this._driver, metadata as AnimationMetadata, errors, warnings) as TriggerAst;
       if (errors.length) {
         throw new Error(`The animation trigger "${
             name}" has failed to build due to the following errors:\n - ${errors.join('\n - ')}`);
+      }
+      if (ngDevMode && warnings.length) {
+        console.warn(`The animation trigger "${name}" has built with the following warnings:\n - ${
+            warnings.join('\n - ')}`);
       }
       trigger = buildTrigger(name, ast, this._normalizer);
       this._triggerCache[cacheKey] = trigger;
