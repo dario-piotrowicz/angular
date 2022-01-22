@@ -12,6 +12,7 @@ import {TriggerAst} from '../src/dsl/animation_ast';
 import {buildAnimationAst} from '../src/dsl/animation_ast_builder';
 import {AnimationTrigger, buildTrigger} from '../src/dsl/animation_trigger';
 import {NoopAnimationStyleNormalizer} from '../src/dsl/style_normalization/animation_style_normalizer';
+import {conditionallyShowWarningsCombination, conditionallyThrowErrorsCombination} from '../src/errors-and-warnings.utils';
 import {MockAnimationDriver} from '../testing/src/mock_animation_driver';
 
 export function makeTrigger(
@@ -21,14 +22,11 @@ export function makeTrigger(
   const warnings: string[] = [];
   const triggerData = trigger(name, steps);
   const triggerAst = buildAnimationAst(driver, triggerData, errors, warnings) as TriggerAst;
-  const LINE_START = '\n - ';
-  if (!skipErrors && errors.length) {
-    throw new Error(`Animation parsing for the ${name} trigger have failed:${LINE_START}${
-        errors.join(LINE_START)}`);
+  if (!skipErrors) {
+    conditionallyThrowErrorsCombination(
+        `Animation parsing for the ${name} trigger have failed`, errors);
   }
-  if (ngDevMode && warnings.length) {
-    console.warn(`Animation parsing for the ${name} trigger presents warnings:${LINE_START}${
-        warnings.join(LINE_START)}`);
-  }
+  conditionallyShowWarningsCombination(
+      `Animation parsing for the ${name} trigger presents the following warnings`, warnings);
   return buildTrigger(name, triggerAst, new NoopAnimationStyleNormalizer());
 }

@@ -9,6 +9,8 @@ import {AnimationEvent, AnimationPlayer, AUTO_STYLE, NoopAnimationPlayer, ɵAnim
 
 import {AnimationStyleNormalizer} from '../../src/dsl/style_normalization/animation_style_normalizer';
 import {AnimationDriver} from '../../src/render/animation_driver';
+import {conditionallyThrowErrorsCombination} from '../errors-and-warnings.utils';
+
 
 // We don't include ambient node types here since @angular/animations/browser
 // is meant to target the browser so technically it should not depend on node
@@ -79,11 +81,7 @@ export function normalizeKeyframes(
     previousKeyframe = normalizedKeyframe;
     previousOffset = offset;
   });
-  if (errors.length) {
-    const LINE_START = '\n - ';
-    throw new Error(
-        `Unable to animate due to the following errors:${LINE_START}${errors.join(LINE_START)}`);
-  }
+  conditionallyThrowErrorsCombination('Unable to animate due to the following errors', errors);
 
   return normalizedKeyframes;
 }

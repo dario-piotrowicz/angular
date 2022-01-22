@@ -13,6 +13,7 @@ import {AnimationTransitionInstruction} from '../dsl/animation_transition_instru
 import {AnimationTrigger} from '../dsl/animation_trigger';
 import {ElementInstructionMap} from '../dsl/element_instruction_map';
 import {AnimationStyleNormalizer} from '../dsl/style_normalization/animation_style_normalizer';
+import {conditionallyThrowErrorsCombination} from '../errors-and-warnings.utils';
 import {copyObj, ENTER_CLASSNAME, eraseStyles, LEAVE_CLASSNAME, NG_ANIMATING_CLASSNAME, NG_ANIMATING_SELECTOR, NG_TRIGGER_CLASSNAME, NG_TRIGGER_SELECTOR, setStyles} from '../util';
 
 import {AnimationDriver} from './animation_driver';
@@ -906,9 +907,8 @@ export class TransitionAnimationEngine {
   }
 
   reportError(errors: string[]) {
-    throw new Error(
-        `Unable to process animations due to the following failed trigger transitions\n ${
-            errors.join('\n')}`);
+    conditionallyThrowErrorsCombination(
+        'Unable to process animations due to the following failed trigger transitions', errors);
   }
 
   private _flushAnimations(cleanupFns: Function[], microtaskId: number):
@@ -1097,7 +1097,7 @@ export class TransitionAnimationEngine {
       const errors: string[] = [];
       erroneousTransitions.forEach(instruction => {
         errors.push(`@${instruction.triggerName} has failed due to:\n`);
-        instruction.errors!.forEach(error => errors.push(`- ${error}\n`));
+        instruction.errors!.forEach(error => errors.push(error));
       });
 
       allPlayers.forEach(player => player.destroy());

@@ -5,6 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import {conditionallyThrowErrorsCombination} from '@angular/animations/browser/src/errors-and-warnings.utils';
+
 import {WebAnimationsStyleNormalizer} from '../../../src/dsl/style_normalization/web_animations_style_normalizer';
 
 {
@@ -25,9 +27,7 @@ import {WebAnimationsStyleNormalizer} from '../../../src/dsl/style_normalization
       function normalize(prop: string, val: string|number): string {
         const errors: string[] = [];
         const result = normalizer.normalizeStyleValue(prop, prop, val, errors);
-        if (errors.length) {
-          throw new Error(errors.join('\n'));
-        }
+        conditionallyThrowErrorsCombination('', errors);
         return result;
       }
 

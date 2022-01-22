@@ -13,6 +13,7 @@ import {buildAnimationTimelines} from '../dsl/animation_timeline_builder';
 import {AnimationTimelineInstruction} from '../dsl/animation_timeline_instruction';
 import {ElementInstructionMap} from '../dsl/element_instruction_map';
 import {AnimationStyleNormalizer} from '../dsl/style_normalization/animation_style_normalizer';
+import {conditionallyShowWarningsCombination, conditionallyThrowErrorsCombination} from '../errors-and-warnings.utils';
 import {ENTER_CLASSNAME, LEAVE_CLASSNAME} from '../util';
 
 import {AnimationDriver} from './animation_driver';
@@ -33,13 +34,10 @@ export class TimelineAnimationEngine {
     const errors: string[] = [];
     const warnings: string[] = [];
     const ast = buildAnimationAst(this._driver, metadata, errors, warnings);
-    if (errors.length) {
-      throw new Error(
-          `Unable to build the animation due to the following errors: ${errors.join('\n')}`);
-    } else {
-      if (ngDevMode && warnings.length) {
-        console.warn(`Animation built with the following warnings: "${warnings.join('\n')}`);
-      }
+    conditionallyThrowErrorsCombination(
+        'Unable to build the animation due to the following errors', errors);
+    if (!errors.length) {
+      conditionallyShowWarningsCombination('Animation built with the following warnings', warnings);
       this._animations.set(id, ast);
     }
   }
@@ -74,10 +72,8 @@ export class TimelineAnimationEngine {
       instructions = [];
     }
 
-    if (errors.length) {
-      throw new Error(
-          `Unable to create the animation due to the following errors: ${errors.join('\n')}`);
-    }
+    conditionallyThrowErrorsCombination(
+        'Unable to create the animation due to the following errors', errors);
 
     autoStylesMap.forEach((styles, element) => {
       styles.forEach((_, prop) => {

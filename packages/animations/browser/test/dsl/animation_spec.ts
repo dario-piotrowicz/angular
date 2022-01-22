@@ -11,6 +11,7 @@ import {Animation} from '../../src/dsl/animation';
 import {buildAnimationAst} from '../../src/dsl/animation_ast_builder';
 import {AnimationTimelineInstruction} from '../../src/dsl/animation_timeline_instruction';
 import {ElementInstructionMap} from '../../src/dsl/element_instruction_map';
+import {conditionallyThrowErrorsCombination} from '../../src/errors-and-warnings.utils';
 import {MockAnimationDriver} from '../../testing';
 
 function createDiv() {
@@ -1129,9 +1130,7 @@ function validateAndThrowAnimationSequence(steps: AnimationMetadata|AnimationMet
   const driver = new MockAnimationDriver();
   const errors: string[] = [];
   const ast = buildAnimationAst(driver, steps, errors, []);
-  if (errors.length) {
-    throw new Error(errors.join('\n'));
-  }
+  conditionallyThrowErrorsCombination('', errors);
 }
 
 function getValidationWarningsForAnimationSequence(steps: AnimationMetadata|

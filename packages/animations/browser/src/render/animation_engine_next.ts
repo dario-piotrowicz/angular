@@ -11,6 +11,7 @@ import {TriggerAst} from '../dsl/animation_ast';
 import {buildAnimationAst} from '../dsl/animation_ast_builder';
 import {AnimationTrigger, buildTrigger} from '../dsl/animation_trigger';
 import {AnimationStyleNormalizer} from '../dsl/style_normalization/animation_style_normalizer';
+import {conditionallyShowWarningsCombination, conditionallyThrowErrorsCombination} from '../errors-and-warnings.utils';
 
 import {AnimationDriver} from './animation_driver';
 import {parseTimelineCommand} from './shared';
@@ -46,14 +47,11 @@ export class AnimationEngine {
       const warnings: string[] = [];
       const ast = buildAnimationAst(
                       this._driver, metadata as AnimationMetadata, errors, warnings) as TriggerAst;
-      if (errors.length) {
-        throw new Error(`The animation trigger "${
-            name}" has failed to build due to the following errors:\n - ${errors.join('\n - ')}`);
-      }
-      if (ngDevMode && warnings.length) {
-        console.warn(`The animation trigger "${name}" has built with the following warnings:\n - ${
-            warnings.join('\n - ')}`);
-      }
+      conditionallyThrowErrorsCombination(
+          `The animation trigger "${name}" has failed to build due to the following errors`,
+          errors);
+      conditionallyShowWarningsCombination(
+          `The animation trigger "${name}" has built with the following warnings`, warnings);
       trigger = buildTrigger(name, ast, this._normalizer);
       this._triggerCache[cacheKey] = trigger;
     }

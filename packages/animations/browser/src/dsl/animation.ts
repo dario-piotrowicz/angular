@@ -7,6 +7,7 @@
  */
 import {AnimationMetadata, AnimationMetadataType, AnimationOptions, ɵStyleDataMap} from '@angular/animations';
 
+import {conditionallyShowWarningsCombination, conditionallyThrowErrorsCombination} from '../errors-and-warnings.utils';
 import {AnimationDriver} from '../render/animation_driver';
 import {ENTER_CLASSNAME, LEAVE_CLASSNAME, normalizeStyles} from '../util';
 
@@ -22,13 +23,8 @@ export class Animation {
     const errors: string[] = [];
     const warnings: string[] = [];
     const ast = buildAnimationAst(_driver, input, errors, warnings);
-    if (errors.length) {
-      const errorMessage = `animation validation failed:\n${errors.join('\n')}`;
-      throw new Error(errorMessage);
-    }
-    if (ngDevMode && warnings.length) {
-      console.warn(`animation validation warnings:\n"${warnings.join('\n')}`);
-    }
+    conditionallyThrowErrorsCombination('animation validation failed', errors);
+    conditionallyShowWarningsCombination('animation validation warnings', warnings);
     this._animationAst = ast;
   }
 
@@ -45,10 +41,7 @@ export class Animation {
     const result = buildAnimationTimelines(
         this._driver, element, this._animationAst, ENTER_CLASSNAME, LEAVE_CLASSNAME, start, dest,
         options, subInstructions, errors);
-    if (errors.length) {
-      const errorMessage = `animation building failed:\n${errors.join('\n')}`;
-      throw new Error(errorMessage);
-    }
+    conditionallyThrowErrorsCombination('animation building failed', errors);
     return result;
   }
 }
