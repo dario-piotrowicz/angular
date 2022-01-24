@@ -308,6 +308,10 @@ export class AnimationAstBuilderVisitor implements AnimationDslVisitor {
 
       tuple.forEach((value, prop) => {
         if (!this._driver.validateStyleProperty(prop)) {
+          // TODO: the prop can be removed from the tuple since it is not a valid
+          // css property, `delete` has a negative impact on performance but `tuple`
+          // is being changed to a Map in PR #44482, the operation will then be changed
+          // to `tuple.delete(prop)` which will be much more performant and acceptable
           delete tuple[prop];
           context.unsupportedCSSPropertiesFound.add(prop);
           return;
