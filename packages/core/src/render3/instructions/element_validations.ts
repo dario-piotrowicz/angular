@@ -19,41 +19,42 @@ import {isAnimationProp} from '../util/attrs_utils';
 
 import {KNOWN_CONTROL_FLOW_DIRECTIVES, matchingSchemas} from './shared';
 
-let shouldThrowErrorOnUnknownElement = false;
-
 /**
- * Sets a strict mode for JIT-compiled components to throw an error on unknown elements,
- * instead of just logging the error.
+ * Sets strict mode utilities for JIT-compiled components so that they can throw errors instead of
+ * logging them.
  * (for AOT-compiled ones this check happens at build time).
  */
-export function ɵsetUnknownElementStrictMode(shouldThrow: boolean) {
-  shouldThrowErrorOnUnknownElement = shouldThrow;
-}
+export const {
+  ɵsetUnknownElementStrictMode,
+  ɵsetUnknownPropertyStrictMode,
+  ɵgetUnknownElementStrictMode,
+  ɵgetUnknownPropertyStrictMode,
+} = (function generateStrictModeUtilities() {
+  const enum TypeOfError {
+    unknownElement,
+    unknownProperty,
+  }
 
-/**
- * Gets the current value of the strict mode.
- */
-export function ɵgetUnknownElementStrictMode() {
-  return shouldThrowErrorOnUnknownElement;
-}
+  const errorsToThrow = {
+    [TypeOfError.unknownElement]: false,
+    [TypeOfError.unknownProperty]: false,
+  };
 
-let shouldThrowErrorOnUnknownProperty = false;
+  function setErrorToThrow(typeOfError: TypeOfError) {
+    return (shouldThrow: boolean) => (errorsToThrow[typeOfError] = shouldThrow);
+  }
 
-/**
- * Sets a strict mode for JIT-compiled components to throw an error on unknown properties,
- * instead of just logging the error.
- * (for AOT-compiled ones this check happens at build time).
- */
-export function ɵsetUnknownPropertyStrictMode(shouldThrow: boolean) {
-  shouldThrowErrorOnUnknownProperty = shouldThrow;
-}
+  function getErrorToThrow(typeOfError: TypeOfError) {
+    return () => errorsToThrow[typeOfError];
+  }
 
-/**
- * Gets the current value of the strict mode.
- */
-export function ɵgetUnknownPropertyStrictMode() {
-  return shouldThrowErrorOnUnknownProperty;
-}
+  return {
+    ɵsetUnknownElementStrictMode: setErrorToThrow(TypeOfError.unknownElement),
+    ɵsetUnknownPropertyStrictMode: setErrorToThrow(TypeOfError.unknownProperty),
+    ɵgetUnknownElementStrictMode: getErrorToThrow(TypeOfError.unknownElement),
+    ɵgetUnknownPropertyStrictMode: getErrorToThrow(TypeOfError.unknownProperty),
+  };
+})();
 
 /**
  * Validates that the element is known at runtime and produces
@@ -112,6 +113,7 @@ export function validateElementIsKnown(
         message +=
             `2. To allow any element add 'NO_ERRORS_SCHEMA' to the ${schemas} of this component.`;
       }
+      const shouldThrowErrorOnUnknownElement = ɵgetUnknownElementStrictMode();
       if (shouldThrowErrorOnUnknownElement) {
         throw new RuntimeError(RuntimeErrorCode.UNKNOWN_ELEMENT, message);
       } else {
@@ -140,13 +142,8 @@ export function validateElementIsKnown(
  * @param lView An `LView` that represents a current component that is being rendered
  */
 export function validateElementProperty(
-    element: RElement|RComment,
-    tagName: string|null,
-    propName: string,
-    schemas: SchemaMetadata[]|null,
-    tNode: TNode,
-    lView: LView,
-    ): boolean {
+    element: RElement|RComment, tagName: string|null, propName: string,
+    schemas: SchemaMetadata[]|null, tNode: TNode, lView: LView): boolean {
   const propertyIsValid = isPropertyValid(element, tagName, propName, schemas);
   if (!propertyIsValid) {
     handleUnknownPropertyError(propName, tNode, lView);
@@ -241,7 +238,7 @@ export function handleUnknownPropertyError(propName: string, tNode: TNode, lView
           `the ${schemas} of this component.`;
     }
   }
-
+  const shouldThrowErrorOnUnknownProperty = ɵgetUnknownPropertyStrictMode();
   if (shouldThrowErrorOnUnknownProperty) {
     throw new RuntimeError(RuntimeErrorCode.UNKNOWN_BINDING, message);
   } else {
